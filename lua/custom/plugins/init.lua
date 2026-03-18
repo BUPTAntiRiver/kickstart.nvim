@@ -18,4 +18,9 @@ return {
     },
     opts = {},
   },
+  {
+    'mrcjkb/rustaceanvim', -- Need to run `rustup component add rust-analyzer` first
+    version = '^5', -- Recommended to use a stable version
+    lazy = false, -- This plugin is already lazy-loaded by default
+  },
 }
