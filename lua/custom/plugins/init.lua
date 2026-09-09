@@ -23,4 +23,14 @@ return {
     version = '^5', -- Recommended to use a stable version
     lazy = false, -- This plugin is already lazy-loaded by default
   },
+  {
+    'navarasu/onedark.nvim',
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require('onedark').setup {
+        style = 'darker',
+      }
+      require('onedark').load()
+    end,
+  },
 }
