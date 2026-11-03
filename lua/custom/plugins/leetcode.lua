@@ -1,18 +1,34 @@
 -- LeetCode inside Neovim: https://github.com/kawre/leetcode.nvim
 --
--- Entry point:  :Leet
---   :Leet            dashboard (daily / random / search)
---   :Leet list       browse all problems (filter by status/difficulty)
---   :Leet daily      today's problem
---   :Leet run        run against the testcases
---   :Leet submit     submit the solution
---   :Leet lang       switch language for the current question
---   :Leet exit       leave the leetcode UI
+-- Launch
+--   nvim leetcode.nvim    opens the dashboard (must be the only argument)
+--   :Leet                 opens it from a clean session (no listed buffers)
+--   The first :Leet must be bare - subcommands work once the UI is up.
 --
--- Notes:
---   * Targets leetcode.cn, because leetcode.com is unreachable here (403).
---   * `:Leet` needs a "clean" session: no other listed buffers open.
---   * Solutions live in ~/.local/share/nvim/leetcode (per-question dirs, git-friendly).
+-- Commands, once open
+--   :Leet daily | random | list    today's / a random / browse all problems
+--   :Leet run | submit             test against testcases / submit (needs login)
+--   :Leet lang                     change language for the current question
+--   :Leet reset | last_submit      restore starter code / last accepted code
+--   :Leet exit                     leave the UI
+--
+-- Default keys (change them in `keys` below)
+--   q    close the focused popup/split     r    reset testcases
+--   U    use the current testcase          H    focus testcases
+--   L    focus the result                  <CR> confirm something in a picker
+--
+-- Signing in (both run and submit require it)
+--   Press `s` on the dashboard, or `:Leet cookie update`, then paste the
+--   `cookie:` REQUEST header from a logged-in leetcode.cn session
+--   (DevTools > Network > any graphql request > Request Headers).
+--   Paste the request header, never `set-cookie` from the response.
+--
+-- Notes
+--   * leetcode.cn, not .com: leetcode.com is unreachable here (403) and its
+--     old problemsetQuestionList API endpoint has been removed.
+--   * Solutions are flat files in ~/.local/share/nvim/leetcode/, named like
+--     `1.two-sum.py` - one file per problem, handy to keep in a git repo.
+--   * Cookie and problem list live in ~/.cache/nvim/leetcode/.
 
 ---@module 'lazy'
 ---@type LazySpec
