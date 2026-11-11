@@ -47,7 +47,7 @@ return {
     'nvim-telescope/telescope.nvim',
   },
   opts = {
-    lang = 'python3',
+    lang = 'cpp',
 
     cn = {
       enabled = true, ---@type boolean use leetcode.cn instead of leetcode.com
