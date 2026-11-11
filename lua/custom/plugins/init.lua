@@ -24,13 +24,20 @@ return {
     lazy = false, -- This plugin is already lazy-loaded by default
   },
   {
-    'navarasu/onedark.nvim',
-    priority = 1000, -- make sure to load this before all the other start plugins
+    'rebelot/kanagawa.nvim',
+    -- highest priority among start plugins: the scheme is applied before the
+    -- rest of the UI loads, so there's no flash of default colors
+    priority = 1000,
     config = function()
-      require('onedark').setup {
-        style = 'dark',
+      require('kanagawa').setup {
+        theme = 'lotus', -- wave (default) | dragon (near-black, warm reds) | lotus (light)
+        transparent = false, -- true: use your terminal background
+        dimInactive = true,
+        styles = {
+          comments = { italic = false },
+        },
       }
-      require('onedark').load()
+      vim.cmd.colorscheme 'kanagawa-dragon'
     end,
   },
 }
