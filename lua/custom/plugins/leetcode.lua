@@ -32,6 +32,32 @@
 
 ---@module 'lazy'
 ---@type LazySpec
+
+-- leetcode.nvim's leetcode.cn support swaps in a Chinese-tuned normalizer that
+-- (a) only recognises 示例/输入/输出/提示 tags and (b) rewrites ASCII ':' to '：'.
+-- With translate_problems = false we render the English fields, so that normalizer
+-- mangles them. Keep the English one: capture it before the cn plugin patches the
+-- class, and restore it after each start (the patch re-applies on every `:Leet`).
+-- Everything is pcall'ed, so a change in plugin internals just turns this into a no-op.
+local base_normalizer = {}
+
+local function restore_english_normalizer()
+  local ok_cfg, config = pcall(require, 'leetcode.config')
+  if not ok_cfg then
+    return
+  end
+  local cn = config.user.cn or {}
+  if not cn.enabled or cn.translate_problems then
+    return -- Chinese descriptions were requested; leave the cn normalizer alone
+  end
+
+  local ok_mod, normalizer = pcall(require, 'leetcode.parser.normalizer')
+  if ok_mod and base_normalizer.cleanup then
+    normalizer.cleanup = base_normalizer.cleanup
+    normalizer.tags = base_normalizer.tags
+  end
+end
+
 return {
   'kawre/leetcode.nvim',
   -- load at startup so both entry points work:
@@ -46,16 +72,33 @@ return {
     -- a picker is required; you already have telescope from kickstart
     'nvim-telescope/telescope.nvim',
   },
+  config = function(_, opts)
+    require('leetcode').setup(opts)
+
+    -- runs before the cn plugin loads, so these are the English implementations
+    local ok, normalizer = pcall(require, 'leetcode.parser.normalizer')
+    if ok then
+      base_normalizer.cleanup, base_normalizer.tags = normalizer.cleanup, normalizer.tags
+    end
+  end,
   opts = {
-    lang = 'cpp',
+    lang = 'python3',
 
     cn = {
       enabled = true, ---@type boolean use leetcode.cn instead of leetcode.com
-      translator = true, ---@type boolean Chinese UI labels
-      translate_problems = true, ---@type boolean translate descriptions to Chinese
+      translator = false, ---@type boolean false = English UI chrome, true = Chinese
+      -- false -> English: uses the `content` / `title` fields
+      -- true  -> Chinese: uses `translatedContent` / `translatedTitle`
+      -- Affects the description, the title header and the problem-list picker.
+      translate_problems = false, ---@type boolean
     },
 
     picker = { provider = 'telescope' },
+
+    -- runs after `config.setup()`, i.e. after the cn plugin patched the normalizer
+    hooks = {
+      enter = { restore_english_normalizer },
+    },
 
     -- where your solutions are saved
     storage = {
